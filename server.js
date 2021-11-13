@@ -3,6 +3,7 @@ const path = require("path");
 const app = express();
 const PORT = 3001;
 const fs = require("fs");
+const shortId = require("shortid");
 
 /*
 Sends all static file (ones that don't manifest as objects)
@@ -29,19 +30,19 @@ app.get("/api/notes", (req, res) => {
 });
 
 app.post("/api/notes", (req, res) => {
-    console.log("POST route has been called");
     let notes = null;
+
     notes = JSON.parse(fs.readFileSync("./db/db.json")); 
-    if (!notes) {notes = [];} 
-    let id = 0;
+    if (notes === null) {
+        notes = [];
+    } 
     
     let newNote = {
         title: req.body.title, text: req.body.text,
-        id: id
+        id: shortId.generate()
     };
     notes.push(newNote);
     
-    //writes entire notes array back into json file; overwrites what's there
     // notes, null, unknown; look up (formats json rewrite, third param related to spacing and formatting)
     fs.writeFileSync("./db/db.json", JSON.stringify(notes), err => {
         if (err) throw err;
